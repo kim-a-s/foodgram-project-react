@@ -1,9 +1,9 @@
 from django.core.validators import MinValueValidator, RegexValidator
-from django.db import models
 from django.contrib.auth import get_user_model
-from users.models import User
+from django.db import models
 
 User = get_user_model()
+
 
 class Ingredient(models.Model):
     """Модель ингредиентов."""
@@ -24,7 +24,7 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
-    
+
 
 class Tag(models.Model):
     """Модель тегов."""
@@ -94,7 +94,7 @@ class Recipe(models.Model):
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления в минутах',
         validators=[MinValueValidator(
-            1, message='Мин. время приготовления 1 минута'),]
+            1, message='Мин. время приготовления 1 минута')]
     )
     pub_date = models.DateTimeField(
         'Дата публикации',
@@ -105,14 +105,14 @@ class Recipe(models.Model):
         ordering = ['-pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-    
+
     def __str__(self):
         return self.name
 
 
 class RecipeIngredient(models.Model):
     """Модель для связи ингредиентов с рецептами."""
-    
+
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -213,7 +213,7 @@ class Favorite(models.Model):
         return f'{self.user} => {self.recipe}'
 
 
-class Shopping_cart(models.Model):
+class ShoppingСart(models.Model):
     """Модель добавленных в корзину рецептов."""
     user = models.ForeignKey(
         User,

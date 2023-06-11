@@ -1,16 +1,18 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
 
 from . import serializers
-from recipes import models
 from .filters import RecipeFilter
 from .pagination import PagePagination
+from recipes import models
 
 User = get_user_model()
 
@@ -34,7 +36,7 @@ class UserViewSet(mixins.CreateModelMixin,
         if self.action in ('list', 'retrieve',):
             return serializers.UserSerializer
         return serializers.UserCreateSerializer
-    
+
     @action(detail=False, methods=['get'],
             pagination_class=None,
             permission_classes=(permissions.IsAuthenticated,))
@@ -42,7 +44,7 @@ class UserViewSet(mixins.CreateModelMixin,
         serializer = serializers.UserSerializer(request.user)
         return Response(serializer.data,
                         status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=['post'],
             permission_classes=(permissions.IsAuthenticated,))
     def set_password(self, request):
@@ -55,15 +57,19 @@ class UserViewSet(mixins.CreateModelMixin,
         return Response(
             {'error': 'Введите верные данные!'},
             status=status.HTTP_400_BAD_REQUEST)
-    
+
     @action(detail=False, methods=['get'],
             permission_classes=(permissions.IsAuthenticated,),
             pagination_class=PagePagination)
     def subscriptions(self, request):
         queryset = User.objects.filter(subscribing__user=request.user)
         page = self.paginate_queryset(queryset)
-        serializer = serializers.SubscriptionSerializer(page, many=True,
-                                             context={'request': request})
+        serializer = serializers.SubscriptionSerializer(page,
+                                                        many=True,
+                                                        context={
+                                                            'request': request
+                                                        }
+        )
         return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=['post', 'delete'],
@@ -75,7 +81,10 @@ class UserViewSet(mixins.CreateModelMixin,
             serializer = serializers.SubscriptionCreateSerializer(
                 author, data=request.data, context={"request": request})
             serializer.is_valid(raise_exception=True)
-            models.Subscription.objects.create(user=request.user, author=author)
+            models.Subscription.objects.create(
+                user=request.user,
+                author=author
+            )
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
 
@@ -94,7 +103,9 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = models.Recipe.objects.all()
     pagination_class = PagePagination
-    filter_backends = [filters.OrderingFilter, filters.SearchFilter, DjangoFilterBackend]
+    filter_backends = [filters.OrderingFilter,
+                       filters.SearchFilter,
+                       DjangoFilterBackend]
     filterset_class = RecipeFilter
     ordering_fields = ['-pub_date']
     search_fields = ['tags']
@@ -103,19 +114,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve',):
             return serializers.RecipeSerializer
         return serializers.RecipeCreateSerializer
-    
+
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(permissions.IsAuthenticated,))
     def favorite(self, request, **kwargs):
         recipe = get_object_or_404(models.Recipe, id=kwargs['pk'])
 
         if request.method == 'POST':
-            serializer = serializers.RecipeSerializer(recipe, data=request.data,
-                                                      context={"request": request})
+            serializer = serializers.RecipeSerializer(recipe,
+                                                      data=request.data,
+                                                      context={
+                                                          "request": request
+                                                          }
+            )
             serializer.is_valid(raise_exception=True)
             if not models.Favorite.objects.filter(user=request.user,
                                                   recipe=recipe).exists():
-                models.Favorite.objects.create(user=request.user, recipe=recipe)
+                models.Favorite.objects.create(user=request.user,
+                                               recipe=recipe)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
             return Response({'errors': 'Рецепт уже в избранном.'},
@@ -136,16 +152,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer = serializers.RecipeSerializer(recipe, data=request.data,
                                                       context={"request": request})
             serializer.is_valid(raise_exception=True)
-            if not models.Shopping_cart.objects.filter(user=request.user,
+            if not models.ShoppingСart.objects.filter(user=request.user,
                                                 recipe=recipe).exists():
-                models.Shopping_cart.objects.create(user=request.user, recipe=recipe)
+                models.ShoppingСart.objects.create(user=request.user, recipe=recipe)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
             return Response({'errors': 'Рецепт уже в списке покупок.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
         if request.method == 'DELETE':
-            get_object_or_404(models.Shopping_cart, user=request.user,
+            get_object_or_404(models.ShoppingСart, user=request.user,
                               recipe=recipe).delete()
             return Response(
                 {'detail': 'Рецепт успешно удален из списка покупок.'},

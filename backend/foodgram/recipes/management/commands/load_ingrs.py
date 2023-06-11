@@ -24,6 +24,5 @@ class Command(BaseCommand):
             except Exception as error:
                 print(f"Ошибка при добавлении {note['name']}.\n"
                       f"{error}")
-                
+
         print('Загрузка ингредиентов завершена')
-        
