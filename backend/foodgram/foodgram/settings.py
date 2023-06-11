@@ -32,7 +32,7 @@ SECRET_KEY = 'ntug3ubdr@i58m*srg7c5v!=#-j7q-nxe_4%=@(c(hwlxvx--3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'recipes.apps.RecipesConfig',
     'users.apps.UsersConfig',
+    'django_filters',
     'rest_framework',
     'api.apps.ApiConfig',
     'rest_framework.authtoken',
@@ -123,23 +124,13 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
 }
 
 DJOSER = {
-    # 'HIDE_USERS': False,
-    # 'SEND_ACTIVATION_EMAIL': False,
-    # 'LOGIN_FIELD': 'email',
-    # 'SERIALIZERS': {
-    #     'current_user': 'api.serializers.UserSerializer',
-    #     'user_create': 'api.serializers.CustomUserCreateSerializer',
-    #     'user': 'api.serializers.UserSerializer',
-    # },
-    'PERMISSIONS': {
-        'user': ['rest_framework.permissions.AllowAny'],
-        'user_list': ['rest_framework.permissions.AllowAny'],
-        'set_password': ['rest_framework.permissions.IsAuthenticated'],
-    }
+    'LOGIN_FIELD': 'email',
 }
 
 
@@ -161,8 +152,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 AUTH_USER_MODEL = 'users.User'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/.*$'
