@@ -18,6 +18,7 @@ from .serializers import (IngredientSerializer,
                           UserSerializer,)
 from .filters import RecipeFilter
 from .pagination import PagePagination
+from.utils import post_delete_fav_cart
 from recipes.models import (Favorite,
                             Ingredient,
                             Recipe,
@@ -29,32 +30,6 @@ from recipes.models import (Favorite,
 User = get_user_model()
 
 FILE_NAME = 'shopping_cart.txt'
-
-
-def post_delete_fav_cart(self, request, pk, func_model):
-    recipe = get_object_or_404(Recipe, id=pk)
-
-    if request.method == 'POST':
-        serializer = RecipeSerializer(recipe,
-                                      data=request.data,
-                                      context={
-                                        "request": request
-                                      }
-        )
-        serializer.is_valid(raise_exception=True)
-        if not func_model.objects.filter(user=request.user,
-                                         recipe=recipe).exists():
-            func_model.objects.create(user=request.user,
-                                      recipe=recipe)
-            return Response(serializer.data,
-                            status=status.HTTP_201_CREATED)
-        return Response({'errors': 'Рецепт уже в списке.'},
-                         status=status.HTTP_400_BAD_REQUEST)
-
-    get_object_or_404(func_model, user=request.user,
-                      recipe=recipe).delete()
-    return Response({'detail': 'Рецепт успешно удален из списка.'},
-                     status=status.HTTP_204_NO_CONTENT)
 
 
 class UserViewSet(mixins.CreateModelMixin,
@@ -152,14 +127,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(permissions.IsAuthenticated,))
     def favorite(self, request, pk):
-        func_model = Favorite
-        return post_delete_fav_cart(self, request, pk, func_model)
+        return post_delete_fav_cart(self, request, pk, Favorite)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(permissions.IsAuthenticated,))
     def shopping_cart(self, request, pk):
-        func_model = ShoppingСart
-        return post_delete_fav_cart(self, request, pk, func_model)
+        return post_delete_fav_cart(self, request, pk, ShoppingСart)
 
     @action(detail=False, methods=['get'],
             permission_classes=(permissions.IsAuthenticated,))

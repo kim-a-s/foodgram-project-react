@@ -1,5 +1,4 @@
 import django.contrib.auth.password_validation as validators
-
 from django.contrib.auth import get_user_model
 from django.core import exceptions as django_exceptions
 from django.shortcuts import get_object_or_404
@@ -188,21 +187,20 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients = data['ingredients']
         ingredient_list = []
-        for items in ingredients:
-            ingredient = get_object_or_404(Ingredient, id=items['id'])
-            if ingredient in ingredient_list:
+        for item in ingredients:
+            if item in ingredient_list:
                 raise serializers.ValidationError(
                     'Ингредиент должен быть уникальным!')
-            ingredient_list.append(ingredient)
+            ingredient_list.append(item)
 
     def create_objects(self, ingredient_list, recipe):
         """Функция для создания новых объектов."""
         recipe_ingredient_list = []
         for item in ingredient_list:
-            ingredient = Ingredient.objects.get(id=item.get('id'))
-            amount = item.get('amount')
             recipe_ingredient = RecipeIngredient(
-                recipe=recipe, ingredient=ingredient, amount=amount)
+                recipe=recipe,
+                ingredient_id=item.get('id'),
+                amount=item.get('amount'))
             recipe_ingredient_list.append(recipe_ingredient)
         RecipeIngredient.objects.bulk_create(recipe_ingredient_list)
     
