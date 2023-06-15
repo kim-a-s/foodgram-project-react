@@ -13,7 +13,7 @@ services:
      - .env
 
   web:
-    image: kimas6/foodgram_web:v1.1
+    image: kimas6/foodgram_web:latest
     restart: always
     volumes:
       - static_value:/app/static/
