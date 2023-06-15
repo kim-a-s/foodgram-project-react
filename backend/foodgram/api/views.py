@@ -18,7 +18,7 @@ from .serializers import (IngredientSerializer,
                           UserSerializer,)
 from .filters import RecipeFilter
 from .pagination import PagePagination
-from.utils import post_delete_fav_cart
+from .utils import post_delete_fav_cart
 from recipes.models import (Favorite,
                             Ingredient,
                             Recipe,
@@ -66,20 +66,17 @@ class UserViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'detail': 'Пароль изменен!'},
-            status=status.HTTP_204_NO_CONTENT)
+                        status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=(permissions.IsAuthenticated,),
             pagination_class=PagePagination)
     def subscriptions(self, request):
-        queryset = User.objects.filter(subscribing__user=request.user)
+        queryset = User.objects.filter(following__user=request.user)
         page = self.paginate_queryset(queryset)
         serializer = SubscriptionSerializer(page,
-                                                        many=True,
-                                                        context={
-                                                            'request': request
-                                                        }
-        )
+                                            many=True,
+                                            context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=['post', 'delete'],

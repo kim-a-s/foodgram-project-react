@@ -1,7 +1,6 @@
 import django.contrib.auth.password_validation as validators
 from django.contrib.auth import get_user_model
 from django.core import exceptions as django_exceptions
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -203,7 +202,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 amount=item.get('amount'))
             recipe_ingredient_list.append(recipe_ingredient)
         RecipeIngredient.objects.bulk_create(recipe_ingredient_list)
-    
+
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredient_list = validated_data.pop('ingredients')
