@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.core import exceptions as django_exceptions
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from .fields import Base64ImageField
 from recipes.models import (Tag,
