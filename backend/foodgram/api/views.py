@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.db.models.aggregates import Count, Sum
-from django.db.models.expressions import Value
 from django.db.models import Sum
+from django.db.models.aggregates import Count
+from django.db.models.expressions import Value
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
