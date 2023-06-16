@@ -239,4 +239,4 @@ class ShoppingСart(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.user.username} - {self.recipe.name}'
+        return f'Рецепт {self.recipe} в списке покупок у {self.user}'
