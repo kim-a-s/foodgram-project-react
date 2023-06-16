@@ -62,6 +62,8 @@ jobs:
             sudo docker-compose stop
             sudo systemctl stop nginx
             sudo docker-compose rm web
+            sudo docker image rm kimas6/foodgram_web:latest
+            sudo docker-compose pull -f web
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env

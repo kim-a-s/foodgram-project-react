@@ -13,10 +13,10 @@ services:
      - .env
 
   web:
-    #image: kimas6/foodgram_web:latest
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: kimas6/foodgram_web:latest
+    # build:
+    #   context: ../backend
+    #   dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/static/
