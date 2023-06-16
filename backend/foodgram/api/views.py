@@ -131,7 +131,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Отображение рецептов.
     Добавление/удаление в/из избранных и списка покупок.
     Скачивание списка покупок."""
-    
+
     queryset = Recipe.objects.all()
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)

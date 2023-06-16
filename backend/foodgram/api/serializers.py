@@ -185,7 +185,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'cooking_time': {'required': True},
         }
 
-
     def create_objects(self, ingredient_list, recipe):
         """Функция для создания новых объектов."""
         recipe_ingredient_list = []
@@ -271,7 +270,6 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
-
 
 
 class SubscriptionCreateSerializer(serializers.ModelSerializer):
