@@ -215,6 +215,7 @@ class Favorite(models.Model):
 
 class ShoppingСart(models.Model):
     """Модель добавленных в корзину рецептов."""
+    
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
