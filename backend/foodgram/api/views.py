@@ -21,7 +21,7 @@ from .permissions import IsAuthorOrAdminPermission
 from .serializers import (IngredientSerializer,
                           RecipeSerializer,
                           RecipeCreateSerializer,
-                          SubscribeRecipeSerializer,
+                          SubFavCartRecipeSerializer,
                           SubscriptionSerializer,
                           SubscriptionCreateSerializer,
                           TagSerializer,
@@ -128,7 +128,10 @@ class AddAndDeleteSubscribe(generics.RetrieveDestroyAPIView,
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """"""
+    """Отображение рецептов.
+    Добавление/удаление в/из избранных и списка покупок.
+    Скачивание списка покупок."""
+    
     queryset = Recipe.objects.all()
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
@@ -153,7 +156,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     'Рецепт уже в избранном')
 
             Favorite.objects.create(user=user, recipe=recipe)
-            serializer = SubscribeRecipeSerializer(
+            serializer = SubFavCartRecipeSerializer(
                 recipe, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -165,14 +168,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk=None):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-
         if self.request.method == 'POST':
             if ShoppingСart.objects.filter(user=user, recipe=recipe).exists():
                 raise exceptions.ValidationError(
                     'Ингредиенты рецепта уже в списке покупок')
 
             ShoppingСart.objects.create(user=user, recipe=recipe)
-            serializer = SubscribeRecipeSerializer(
+            serializer = SubFavCartRecipeSerializer(
                 recipe, context={'request': request})
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)

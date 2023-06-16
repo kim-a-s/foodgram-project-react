@@ -94,12 +94,14 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """Список ингредиентов."""
     class Meta:
         model = Ingredient
         fields = '__all__'
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор для ингредиентов в рецепте."""
     id = serializers.ReadOnlyField(
         source='ingredient.id'
     )
@@ -116,6 +118,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для списка рецептов."""
     tags = TagSerializer(read_only=True, many=True)
     author = UserSerializer()
     ingredients = RecipeIngredientSerializer(many=True, source='recipes')
@@ -182,16 +185,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'cooking_time': {'required': True},
         }
 
-    # def validate(self, data):
-    #     ingredients = data['ingredients']
-    #     ingredient_list = []
-    #     for item in ingredients:
-    #         if item in ingredient_list:
-    #             raise serializers.ValidationError(
-    #                 'Ингредиент должен быть уникальным!')
-    #         ingredient_list.append(item)
-
-    #     return data
 
     def create_objects(self, ingredient_list, recipe):
         """Функция для создания новых объектов."""
@@ -229,23 +222,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                                 context=self.context).data
 
 
-class FavoriteShoppingRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для рецептов, находящихся в списке
-    избранного и списке покупок."""
+class SubFavCartRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для отображения рецепта в
+    Подписках, Избранном и Списке покупок."""
 
     class Meta:
         model = Recipe
-        fields = (
-            'id',
-            'name',
-            'image',
-            'cooking_time'
-        )
-        read_only_fields = (
-            'name',
-            'image',
-            'cooking_time'
-        )
+        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
@@ -281,7 +264,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         recipes = obj.recipes.all()
         if limit:
             recipes = recipes[:int(limit)]
-        serializer = FavoriteShoppingRecipeSerializer(
+        serializer = SubFavCartRecipeSerializer(
             recipes, many=True, read_only=True
         )
         return serializer.data
@@ -289,12 +272,6 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
-
-class SubscribeRecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscriptionCreateSerializer(serializers.ModelSerializer):
@@ -328,6 +305,6 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
         recipes = (
             obj.author.recipes.all()[:int(limit)] if limit
             else obj.author.recipes.all())
-        return SubscribeRecipeSerializer(
+        return SubFavCartRecipeSerializer(
             recipes,
             many=True).data
