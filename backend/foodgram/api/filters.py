@@ -2,10 +2,7 @@ from distutils.util import strtobool
 
 from django_filters import rest_framework
 
-from recipes.models import (Favorite,
-                            ShoppingСart,
-                            Recipe,
-                            Tag,)
+from recipes import models
 
 OPTIONS = (
     ('0', 'False'),
@@ -20,7 +17,7 @@ class RecipeFilter(rest_framework.FilterSet):
     )
     tags = rest_framework.ModelMultipleChoiceFilter(
         field_name='tags__slug',
-        queryset=Tag.objects.all(),
+        queryset=models.Tag.objects.all(),
         to_field_name='slug',
     )
     is_favorited = rest_framework.ChoiceFilter(
@@ -34,9 +31,9 @@ class RecipeFilter(rest_framework.FilterSet):
 
     def is_favorited_method(self, queryset, name, value):
         if self.request.user.is_anonymous:
-            return Recipe.objects.none()
+            return models.Recipe.objects.none()
 
-        favorites = Favorite.objects.filter(user=self.request.user)
+        favorites = models.Favorite.objects.filter(user=self.request.user)
         recipes = [item.recipe.id for item in favorites]
         new_queryset = queryset.filter(id__in=recipes)
 
@@ -46,9 +43,9 @@ class RecipeFilter(rest_framework.FilterSet):
 
     def is_in_shopping_cart_method(self, queryset, name, value):
         if self.request.user.is_anonymous:
-            return Recipe.objects.none()
+            return models.Recipe.objects.none()
 
-        shopping_cart = ShoppingСart.objects.filter(user=self.request.user)
+        shopping_cart = models.ShoppingСart.objects.filter(user=self.request.user)
         recipes = [item.recipe.id for item in shopping_cart]
         new_queryset = queryset.filter(id__in=recipes)
 
@@ -57,5 +54,5 @@ class RecipeFilter(rest_framework.FilterSet):
         return queryset.filter(id__in=recipes)
 
     class Meta:
-        model = Recipe
+        model = models.Recipe
         fields = ('tags', 'author')
