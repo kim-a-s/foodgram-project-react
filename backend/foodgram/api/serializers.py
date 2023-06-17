@@ -2,6 +2,7 @@ import django.contrib.auth.password_validation as validators
 from django.contrib.auth import get_user_model
 from django.core import exceptions as django_exceptions
 from djoser.serializers import UserCreateSerializer
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from .fields import Base64ImageField
@@ -184,6 +185,19 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'image': {'required': True, 'allow_blank': False},
             'cooking_time': {'required': True},
         }
+
+    def validate(self, data):
+        ingredients = data['ingredients']
+        ingredient_list = []
+        for items in ingredients:
+            ingredient = get_object_or_404(
+                Ingredient, id=items['id'])
+            if ingredient in ingredient_list:
+                raise serializers.ValidationError(
+                    'Ингредиент должен быть уникальным!')
+            ingredient_list.append(ingredient)
+        
+        return data
 
     def create_objects(self, ingredient_list, recipe):
         """Функция для создания новых объектов."""

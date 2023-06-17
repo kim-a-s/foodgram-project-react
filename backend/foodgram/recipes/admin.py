@@ -41,7 +41,7 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_editable = ('user', 'recipe')
 
 
-@admin.register(models.ShoppingСart)
+@admin.register(models.ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe')
     list_editable = ('user', 'recipe')

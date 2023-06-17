@@ -1,3 +1,4 @@
+import django_filters as filters
 from distutils.util import strtobool
 
 from django_filters import rest_framework
@@ -8,6 +9,14 @@ OPTIONS = (
     ('0', 'False'),
     ('1', 'True')
 )
+
+
+class IngredientFilter(filters.FilterSet):
+    name = filters.CharFilter(lookup_expr='istartswith')
+
+    class Meta:
+        model = models.Ingredient
+        fields = ('name',)
 
 
 class RecipeFilter(rest_framework.FilterSet):
@@ -41,18 +50,18 @@ class RecipeFilter(rest_framework.FilterSet):
             return queryset.difference(new_queryset)
         return queryset.filter(id__in=recipes)
 
-    # def is_in_shopping_cart_method(self, queryset, name, value):
-    #     if self.request.user.is_anonymous:
-    #         return models.Recipe.objects.none()
+    def is_in_shopping_cart_method(self, queryset, name, value):
+        if self.request.user.is_anonymous:
+            return models.Recipe.objects.none()
 
-    #     shopping_cart = models.ShoppingСart.objects.filter(
-    #         user=self.request.user)
-    #     recipes = [item.recipe.id for item in shopping_cart]
-    #     new_queryset = queryset.filter(id__in=recipes)
+        shopping_cart = models.ShoppingCart.objects.filter(
+            user=self.request.user)
+        recipes = [item.recipe.id for item in shopping_cart]
+        new_queryset = queryset.filter(id__in=recipes)
 
-    #     if not strtobool(value):
-    #         return queryset.difference(new_queryset)
-    #     return queryset.filter(id__in=recipes)
+        if not strtobool(value):
+            return queryset.difference(new_queryset)
+        return queryset.filter(id__in=recipes)
 
     class Meta:
         model = models.Recipe

@@ -15,7 +15,7 @@ from rest_framework import (exceptions,
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .pagination import PagePagination
 from .permissions import IsAuthorOrAdminPermission
 from .serializers import (IngredientSerializer,
@@ -32,7 +32,7 @@ from recipes.models import (Favorite,
                             Ingredient,
                             Recipe,
                             RecipeIngredient,
-                            ShoppingСart,
+                            ShoppingCart,
                             Tag,)
 
 User = get_user_model()
@@ -169,21 +169,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         if self.request.method == 'POST':
-            if ShoppingСart.objects.filter(user=user, recipe=recipe).exists():
+            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
                 raise exceptions.ValidationError(
                     'Ингредиенты рецепта уже в списке покупок')
 
-            ShoppingСart.objects.create(user=user, recipe=recipe)
+            ShoppingCart.objects.create(user=user, recipe=recipe)
             serializer = SubFavCartRecipeSerializer(
                 recipe, context={'request': request})
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if not ShoppingСart.objects.filter(user=user, recipe=recipe).exists():
+        if not ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
             raise exceptions.ValidationError(
                 'Рецептов нет в списке покупок')
 
-        shopping_list = get_object_or_404(ShoppingСart,
+        shopping_list = get_object_or_404(ShoppingCart,
                                           user=user,
                                           recipe=recipe)
         shopping_list.delete()
@@ -212,8 +212,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
+    filterset_class = IngredientFilter
+    filter_backends = (DjangoFilterBackend,
+                       filters.SearchFilter,)
+    filterset_fields = ('name',)
+    search_fields = ('name',)
     pagination_class = None
 
 
