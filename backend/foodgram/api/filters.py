@@ -45,7 +45,8 @@ class RecipeFilter(rest_framework.FilterSet):
     #     if self.request.user.is_anonymous:
     #         return models.Recipe.objects.none()
 
-    #     shopping_cart = models.ShoppingСart.objects.filter(user=self.request.user)
+    #     shopping_cart = models.ShoppingСart.objects.filter(
+    #         user=self.request.user)
     #     recipes = [item.recipe.id for item in shopping_cart]
     #     new_queryset = queryset.filter(id__in=recipes)
 
