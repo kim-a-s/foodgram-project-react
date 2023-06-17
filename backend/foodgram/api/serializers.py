@@ -152,7 +152,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientsEditSerializer(serializers.ModelSerializer):
-    """Выбор ингридиента при создании рецепта."""
+    """Выбор ингредиента при создании рецепта."""
 
     id = serializers.IntegerField()
     amount = serializers.IntegerField(min_value=1)
